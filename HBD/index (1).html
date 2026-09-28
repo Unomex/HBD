@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Happy Birthday, Nadia!</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,600;1,9..144,500&family=Nunito:wght@400;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --plum:#3b1f4a; --rose:#e8577e; --saffron:#f5b335; --blush:#ffe9ee; --ink:#2a1530;
+  --serif:'Fraunces',Georgia,serif; --sans:'Nunito',system-ui,sans-serif;
+}
+*{box-sizing:border-box;margin:0}
+html{scroll-behavior:smooth}
+body{font-family:var(--sans);background:var(--blush);color:var(--ink);line-height:1.6}
+.hero{min-height:100vh;display:grid;grid-template-columns:1.1fr .9fr;align-items:center;gap:2rem;
+  padding:4vw;background:var(--plum);color:var(--blush);position:relative;overflow:hidden}
+.hero h1{font-family:var(--serif);font-size:clamp(2.6rem,7vw,5.8rem);line-height:1.02;font-weight:600}
+.hero p.sub{font-family:var(--serif);font-style:italic;font-size:1.3rem;margin:1.2rem 0 2rem;color:var(--saffron)}
+button{font:inherit;font-weight:600;border:0;border-radius:999px;padding:.9rem 2rem;cursor:pointer;
+  background:var(--saffron);color:var(--ink);transition:transform .15s}
+button:hover{transform:scale(1.04)}
+button:focus-visible,a:focus-visible{outline:3px solid var(--rose);outline-offset:3px}
+.frame{width:min(100%,420px);aspect-ratio:3/4;margin-inline:auto;border-radius:999px 999px 24px 24px;
+  border:8px solid var(--saffron);background:var(--rose) center/cover;overflow:hidden;display:grid;place-items:center}
+.frame img{width:100%;height:100%;object-fit:cover;display:block}
+.frame span{padding:1rem;text-align:center;font-weight:600}
+.wish{max-width:680px;margin:0 auto;padding:5rem 1.5rem;text-align:center;display:none}
+.wish.open{display:block}
+.wish h2{font-family:var(--serif);font-size:clamp(1.8rem,4vw,2.6rem);color:var(--plum);margin-bottom:1.2rem}
+.wish p{font-size:1.15rem;margin-bottom:1rem}
+.wish .sign{font-family:var(--serif);font-style:italic;color:var(--rose);font-size:1.4rem;margin-top:1.5rem}
+.gallery{padding:0 4vw 5rem}
+.gallery h2{font-family:var(--serif);color:var(--plum);text-align:center;font-size:2rem;margin-bottom:1.5rem}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:1rem}
+.grid img{width:100%;aspect-ratio:1;object-fit:cover;border-radius:16px;border:4px solid #fff}
+.grid img:nth-child(even){transform:rotate(1.5deg)}
+.grid img:nth-child(odd){transform:rotate(-1.5deg)}
+footer{text-align:center;padding:2rem;background:var(--plum);color:var(--blush)}
+canvas{position:fixed;inset:0;pointer-events:none;z-index:9}
+@media(max-width:760px){.hero{grid-template-columns:1fr;text-align:center;padding-top:10vw}}
+</style>
+</head>
+<body>
+<canvas id="confetti" aria-hidden="true"></canvas>
+
+<section class="hero">
+  <div>
+    <h1>Happy Birthday, Nadia!</h1>
+    <p class="sub">A little something, made just for you.</p>
+    <button id="openBtn">Open your birthday wish</button>
+  </div>
+  <div class="frame">
+    <!-- Put your photo next to this file and name it girl.jpg -->
+    <img src="girl.jpg" alt="Nadia" onerror="this.replaceWith(Object.assign(document.createElement('span'),{textContent:'Add girl.jpg next to index.html'}))">
+  </div>
+</section>
+
+<section class="wish" id="wish">
+  <h2>Dear Nadia,</h2>
+  <!-- EDIT YOUR MESSAGE HERE -->
+  <p>Today is all about you. Thank you for the laughs, the kindness, and for being exactly who you are.</p>
+  <p>May this year bring you happiness, good health, and every dream you have been holding onto.</p>
+  <p>Have the most wonderful birthday!</p>
+  <p class="sign">With love, Your Name</p>
+</section>
+
+<section class="gallery" id="gallery">
+  <h2>Moments with Nadia</h2>
+  <div class="grid" id="grid"></div>
+</section>
+
+<footer>Made with love for Nadia</footer>
+
+<script>
+// ADD MORE PICTURES: put them in the same folder and list the file names here.
+const photos = ["girl.jpg", "pic1.jpg", "pic2.jpg", "pic3.jpg", "pic4.jpg", "pic5.jpg"];
+
+const grid = document.getElementById('grid');
+photos.forEach(name => {
+  const img = new Image();
+  img.src = name; img.alt = "Photo of Nadia"; img.loading = "lazy";
+  img.onload = () => grid.appendChild(img);   // files that don't exist are simply skipped
+});
+
+const cv = document.getElementById('confetti'), ctx = cv.getContext('2d');
+let bits = [], raf;
+function size(){ cv.width = innerWidth; cv.height = innerHeight; }
+addEventListener('resize', size); size();
+function burst(){
+  const colors = ['#e8577e','#f5b335','#ffe9ee','#8f5ba8'];
+  bits = Array.from({length:160}, () => ({
+    x: innerWidth/2, y: innerHeight/2,
+    vx: (Math.random()-.5)*16, vy: Math.random()*-14-2,
+    s: Math.random()*8+4, c: colors[Math.random()*4|0], r: Math.random()*6
+  }));
+  cancelAnimationFrame(raf); tick();
+}
+function tick(){
+  ctx.clearRect(0,0,cv.width,cv.height);
+  bits.forEach(b => { b.x+=b.vx; b.y+=b.vy; b.vy+=.35; b.r+=.2;
+    ctx.save(); ctx.translate(b.x,b.y); ctx.rotate(b.r); ctx.fillStyle=b.c; ctx.fillRect(-b.s/2,-b.s/2,b.s,b.s*.6); ctx.restore(); });
+  bits = bits.filter(b => b.y < cv.height+20);
+  if(bits.length) raf = requestAnimationFrame(tick); else ctx.clearRect(0,0,cv.width,cv.height);
+}
+document.getElementById('openBtn').addEventListener('click', () => {
+  const w = document.getElementById('wish'); w.classList.add('open');
+  w.scrollIntoView({behavior:'smooth'});
+  if(!matchMedia('(prefers-reduced-motion: reduce)').matches) burst();
+});
+</script>
+</body>
+</html>
